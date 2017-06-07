@@ -29,7 +29,7 @@ function uniqueWords(textPath) {
   let wordDict = {};
   for (var i = 0; i < arrayOfLines.length; i++) {
     let line = arrayOfLines[i];
-    updateWordHash(line);
+    wordDict = updateWordHash(line);
   }
   let wordTuple = sortDict(wordDict);
 
