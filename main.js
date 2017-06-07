@@ -23,7 +23,14 @@ function handleTextFile(textPath) {
 function uniqueWords(textPath) {
   // function which does an xmlhttprequest and return text
   let text = handleTextFile(textPath);
-  let wordDict = wordsToDict(line);
+
+  let arrayOfLines = text.split('\n');
+
+  let wordDict = {};
+  for (var i = 0; i < arrayOfLines.length; i++) {
+    let line = arrayOfLines[i];
+    updateWordHash(line);
+  }
   let wordTuple = sortDict(wordDict);
 
   for (var i = 0; i < wordTuple.length; i++) {
@@ -33,8 +40,7 @@ function uniqueWords(textPath) {
 
 // Taking the input as each line in the text file
 // Using hash table to store each word as a key and its count as value
-function wordsToDict(line) {
-  let wordDict = {};
+function updateWordHash(line) {
   let words = line.split(' ');
   for (var i = 0; i < words.length; i++) {
     // parse each word in the arr using the helper function

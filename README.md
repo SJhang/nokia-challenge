@@ -9,7 +9,7 @@ Question 4: Imagine that we have a customer interested in using our program from
 file and the output should be the combination of the outputs of each node. How would you modify your solution to fulfill the customer's
 requirements?
 
-- I have a function(uniqueWords) that takes line as input and use Hash table to store each unique words from the input. I will make a button on the website where a customer can upload multiple files first. Build another function that takes multiple files and parse each file's text into one text. And then with the already built functions, I would not need to modify the logic.
+- I have a function(updateWordHash) that takes line as input and use Hash table to store each unique words from the input. I will make a button on the website where a customer can upload multiple files first. Build another function that takes multiple files and parse each file's text into one text. And then with the already built functions, I would not need to modify the logic.
 
 Question 5: How would you test the program from question 1?
 
