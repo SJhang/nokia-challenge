@@ -1,23 +1,3 @@
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
-// Using XMLHttpRequest, checks it's readyState and status for the REST API
-// and at success, it should parse the request to text version.
-// but not working.
-function handleTextFile(textPath) {
-  let text;
-  let request = new XMLHttpRequest();
-  request.open('GET', textPath, true);
-  request.onreadystatechange = () => {
-    if (request.readyState == 4) {
-      if (request.status == 200 || request.status == 0) {
-        text = request.responseText;
-      }
-    }
-  }
-  request.send(null);
-  return text;
-}
-
 
 // main function that will log each unique words paired with its count
 function uniqueWords(textPath) {
