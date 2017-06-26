@@ -1,55 +1,99 @@
+window.onload = () => {
+  const inputFile = document.querySelector('.inputFile');
+  const displayResults = document.querySelector('.results');
+  const resultPanel = displayResults.parentNode;
 
-// main function that will log each unique words paired with its count
-function uniqueWords(textPath) {
-  // function which does an xmlhttprequest and return text
-  let text = handleTextFile(textPath);
-
-  let arrayOfLines = text.split('\n');
-
-  let wordDict = {};
-  for (var i = 0; i < arrayOfLines.length; i++) {
-    let line = arrayOfLines[i];
-    wordDict = updateWordHash(line);
+  // parse input word using regex
+  const parseWord = (word) => {
+    return word.replace(/\W/g, '').toLowerCase();
   }
-  let wordTuple = sortDict(wordDict);
 
-  for (var i = 0; i < wordTuple.length; i++) {
-    console.log(wordTuple[i][0], wordTuple[i][1]);
+  const lineToWords = (lines) => {
+    return lines.reduce((result, ind) => {
+      return result.concat(ind.split(' ').map(item => parseWord(item)).sort());
+    }, []);
   }
-}
 
-// Taking the input as each line in the text file
-// Using hash table to store each word as a key and its count as value
-function updateWordHash(line) {
-  let words = line.split(' ');
-  for (var i = 0; i < words.length; i++) {
-    // parse each word in the arr using the helper function
-    let parsed = parseWord(words[i]);
-    if (wordDict[parsed] === undefined) {
-      wordDict[parsed] = 1;
-    } else if (parsed in wordDict) {
-      wordDict[parsed]++;
+  const wordsToDictionary = (array) => {
+    let wordDict = {};
+    array.forEach(word => {
+      if (word === '') return;
+      !wordDict[word] ? wordDict[word] = 1 : wordDict[word]++;
+    })
+    return wordDict;
+  }
+
+  const dictionaryToTuple = (dict) => {
+    const resultArray = [];
+    for (var key in dict) {
+      resultArray.push([key, dict[key]]);
     }
+    return resultArray;
   }
-  return wordDict;
-}
 
-// parse input word using regex
-function parseWord(word) {
-  return word.replace(/\W/g, '').toLowerCase();
-}
-
-// implemented tuple with sort method to order hash key in descending order
-// and values in ascending order
-function sortDict(hash) {
-  let result = [], max;
-  for (var key in hash) {
-    result.push([key, hash[key]]);
+  const sortByOccurence = (tuple) => {
+    tuple.sort((last, next) => (
+      last[1] < next[1] ? 1 : last[1] > next[1] ? -1 : 0
+    ));
   }
-  result.sort();
-  result.sort((a,b) => a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0);
-  return result;
-}
 
-// sortDict(uniqueWords("This is a test example. A short example of a valid input."))
-uniqueWords('./example.txt');
+  // this function doesn't work
+  const sortByAlphabet = (tuple) => {
+    let maxCount = tuple[0][1];
+    let idx = 0;
+    let sortedArray = [];
+    let updatingArray = [];
+    while (maxCount > 0 && idx < tuple.length) {
+      if (tuple[idx][1] === maxCount) {
+        updatingArray.push(tuple[idx]);
+      } else {
+        maxCount--;
+        updatingArray = updatingArray.sort((last, next) => {
+          const [wordL, countL] = last;
+          const [wordN, countN] = next;
+          return wordL > wordN ? 1 : -1;
+        });
+        sortedArray = sortedArray.concat(updatingArray);
+        updatingArray = [];
+      }
+      idx++;
+    }
+    return sortedArray;
+  }
+
+  inputFile.addEventListener('change', e => {
+    const file = inputFile.files[0];
+    const fileTypeRegex = /text.*/;
+    resultPanel.classList.value = 'panel panel-default';
+
+    if (file.type.match(fileTypeRegex)) {
+      let reader = new FileReader();
+
+      // create a display element for input file
+      const inputValues = document.createElement('div');
+      inputValues.setAttribute('class', 'panel-footer inputValues');
+      if (inputFile.nextElementSibling) {
+        inputFile.nextElementSibling.remove();
+      };
+      inputFile.insertAdjacentElement('afterend', inputValues);
+
+      reader.onloadend = (e) => {
+        displayResults.innerText = '';
+        inputValues.innerText = e.target.result;
+        const line = e.target.result.split('\n');
+        const words = lineToWords(line);
+        const wordDictionary = wordsToDictionary(words);
+        const wordTuple = dictionaryToTuple(wordDictionary);
+        sortByOccurence(wordTuple);
+        // const wordResults = sortByAlphabet(wordTuple);
+
+        resultPanel.classList.remove('panel-default');
+        resultPanel.classList.add('panel-success');
+        wordTuple.forEach((item) => {
+          displayResults.innerText += `${item[0]} ${item[1]} \n`
+        });
+      }
+      reader.readAsText(file);
+    }
+  })
+}
